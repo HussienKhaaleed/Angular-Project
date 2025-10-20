@@ -9,7 +9,7 @@
   styleClass="movie-carousel"
 >
   <ng-template pTemplate="item" let-product>
-    <div class="carousel-card">
+    <div class="carousel-card" (click)="showDialogForProduct(product)">
       <div class="poster-container">
         <img [src]="product.image" [alt]="product.name" class="movie-poster" />
         <p-tag
@@ -26,11 +26,14 @@
         <div class="actions">
           <p-button
             icon="pi pi-heart"
-            (click)="toggleFavoriteProduct(product)"
+            (click)="toggleFavoriteProduct(product); $event.stopPropagation()"
             [ngClass]="isFavoriteProduct(product.id) ? 'text-red-500' : 'text-gray-400'"
           ></p-button>
 
-          <p-button icon="pi pi-shopping-cart" (click)="addToCartProduct(product)"></p-button>
+          <p-button
+            icon="pi pi-shopping-cart"
+            (click)="addToCartProduct(product)"
+          ></p-button>
         </div>
       </div>
     </div>
@@ -69,27 +72,78 @@
 
   <div class="movies-grid" *ngIf="!loadingMovies">
     <div class="movie-item" *ngFor="let m of movies">
-      <p-card [header]="m.title">
+      <p-card [header]="m.title" styleClass="clickable-card" (click)="showDialogForMovie(m)">
         <img [src]="m.posterUrl" [alt]="m.title" class="movie-poster" loading="lazy" />
 
         <p class="movie-description">
           {{ m.overview || 'No overview available.' }}
         </p>
 
-        <div class="price">${{ m.price }}</div>
-        <div class="flex justify-content-between mt-3 align-items-center">
-          <div class="flex gap-3">
-            <p-button
-              icon="pi pi-heart"
-              (click)="toggleFavoriteMovie(m)"
-              [ngClass]="isFavoriteMovie(m.id) ? 'text-red-500' : 'text-gray-400'"
-            >
-            </p-button>
+        <div class="flex justify-content-between mt-3">
+          <p-button
+            icon="pi pi-heart"
+            (click)="toggleFavoriteMovie(m)"
+            [ngClass]="isFavoriteMovie(m.id) ? 'text-red-500' : 'text-gray-400'"
+          ></p-button>
 
-            <p-button icon="pi pi-shopping-cart" (click)="addToCartMovie(m)"> </p-button>
-          </div>
+          <p-button
+            icon="pi pi-shopping-cart"
+            (click)="addToCartMovie(m)"
+          ></p-button>
         </div>
       </p-card>
     </div>
   </div>
 </section>
+
+<!-- ---------------- Movie Detail Dialog ---------------- -->
+<p-dialog
+  [header]="getMovieTitle()"
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '50rem' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  [maximizable]="true"
+>
+  <div class="movie-detail-dialog">
+    <div class="movie-detail-top flex gap-4">
+      <img [src]="getMovieImage()" [alt]="getMovieTitle()" class="dialog-movie-image" />
+      <div class="flex-1">
+        <h3>Description</h3>
+        <p>{{ getMovieOverview() }}</p>
+      </div>
+    </div>
+
+    <div class="movie-reviews mt-4">
+      <h3>Reviews</h3>
+
+      <div *ngIf="getMovieReviews().length === 0" class="no-reviews">
+        No reviews yet. Be the first to add one!
+      </div>
+
+      <div *ngFor="let review of getMovieReviews()" class="review-item mb-3">
+        <div class="flex align-items-center justify-content-between mb-2">
+          <p-rating [ngModel]="review.rating" [readonly]="true"></p-rating>
+          <span class="review-date">{{ review.date }}</span>
+        </div>
+        <p class="review-text">{{ review.text }}</p>
+      </div>
+    </div>
+
+    <div class="add-review mt-4">
+      <h3>Add Your Review</h3>
+      <div class="flex align-items-center mb-2">
+        <label class="mr-2">Your Rating:</label>
+        <p-rating [(ngModel)]="userRating"></p-rating>
+      </div>
+      <textarea
+        pInputTextarea
+        [(ngModel)]="newReview"
+        placeholder="Write your review here..."
+        [rows]="3"
+        class="w-full mb-3"
+      ></textarea>
+      <p-button label="Submit Review" icon="pi pi-check" (click)="addReview()"></p-button>
+    </div>
+  </div>
+</p-dialog>
