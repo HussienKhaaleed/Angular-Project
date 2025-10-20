@@ -1,0 +1,92 @@
+<!-- Carousel section -->
+<p-carousel
+  [value]="products"
+  [numVisible]="3"
+  [numScroll]="1"
+  [circular]="true"
+  [responsiveOptions]="responsiveOptions"
+  [autoplayInterval]="3000"
+  styleClass="mb-4"
+>
+  <ng-template pTemplate="item" let-product>
+    <div class="border surface-border rounded m-2 p-3">
+      <div class="mb-3">
+        <div class="relative mx-auto">
+          <img
+            [src]="product.image"
+            [alt]="product.name"
+            class="w-full border-round"
+            style="aspect-ratio: 2/3; object-fit: cover;"
+          />
+          <p-tag
+            [value]="product.inventoryStatus"
+            [severity]="getSeverity(product.inventoryStatus)"
+            class="absolute"
+            [ngStyle]="{ 'left.px': 8, 'top.px': 8 }"
+          ></p-tag>
+        </div>
+      </div>
+
+      <div class="mb-2 font-medium line-clamp-2">{{ product.name }}</div>
+
+      <div class="flex justify-content-between align-items-center">
+        <div class="mt-0 font-semibold text-xl">
+          {{ '$' + product.price }}
+          <span class="text-500 text-sm ml-2">(rating)</span>
+        </div>
+        <span class="flex gap-2">
+          <p-button icon="pi pi-heart" severity="secondary" [outlined]="true"></p-button>
+          <p-button icon="pi pi-info-circle" label="Details" size="small"></p-button>
+        </span>
+      </div>
+    </div>
+  </ng-template>
+</p-carousel>
+
+<!-- Filter by genre + Cards section -->
+<section>
+  <div class="flex align-items-center justify-content-between mb-3">
+    <h2 class="m-0">Filter by genre</h2>
+    <div class="flex align-items-center gap-2">
+      <p-multiSelect
+        [options]="genres"
+        optionLabel="name"
+        optionValue="id"
+        display="chip"
+        placeholder="Select genres"
+        [(ngModel)]="selectedGenres"
+        (onChange)="onGenresChange()"
+        class="min-w-20rem"
+      ></p-multiSelect>
+      <p-button
+        label="Clear"
+        icon="pi pi-times"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="clearGenres()"
+        [disabled]="!selectedGenres.length"
+      ></p-button>
+    </div>
+  </div>
+
+  <div *ngIf="loadingMovies" class="flex justify-content-center py-6">
+    <p-progressSpinner strokeWidth="4"></p-progressSpinner>
+  </div>
+
+  <div class="grid" *ngIf="!loadingMovies">
+    <div class="col-12 sm:col-6 md:col-4 lg:col-3" *ngFor="let m of movies">
+      <!-- Applying your p-card example to TMDB data -->
+      <p-card [header]="m.title">
+        <img
+          [src]="m.posterUrl"
+          [alt]="m.title"
+          class="w-full border-round mb-3"
+          style="aspect-ratio: 2/3; object-fit: cover;"
+        />
+        <p class="m-0">
+          {{ m.overview || 'No overview available.' }}
+        </p>
+      </p-card>
+    </div>
+  </div>
+</section>
