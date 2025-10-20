@@ -44,6 +44,7 @@ export interface ProductLike {
   id: number;
   name: string;
   image: string;
+    overview: string;
   price: number;
   inventoryStatus: string;
 }
@@ -109,6 +110,7 @@ export class TmdbService {
     return {
       id: m.id,
       name: title,
+      overview: m.overview,
       image: m.poster_path ? `${this.imgBase}${m.poster_path}` : '',
       price: Number(rating.toFixed(1)),
       inventoryStatus: this.statusFromRating(rating)
