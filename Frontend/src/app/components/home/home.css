@@ -1,3 +1,164 @@
-p{
-  color: black;
+/* ---------------- Section Padding ---------------- */
+:host {
+  display: block;
+  padding: 1rem 2rem;
+  background-color: #f9fafb; /* optional page background */
+}
+
+/* ---------------- Carousel Styling ---------------- */
+:host ::ng-deep .p-carousel {
+  background-color: white !important; /* match movie cards */
+  padding: 1rem 0;
+  border-radius: 0; /* no rounding on container */
+}
+
+:host ::ng-deep .p-carousel .p-carousel-viewport {
+  background-color: white !important;
+  padding: 0;
+}
+
+:host ::ng-deep .p-carousel .p-carousel-item > div {
+  background-color: #1f2937 !important;
+  padding: 0;
+}
+
+:host ::ng-deep .p-carousel .p-carousel-item > div > div,
+.carousel-card {
+  background-color: #1f2937 !important;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  padding: 1rem;
+  margin: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+:host ::ng-deep .p-carousel .p-carousel-item > div > div:hover,
+.carousel-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+/* Poster */
+.poster-container {
+  position: relative;
+}
+
+.movie-poster {
+  width: 100%;
+  aspect-ratio: 10/8;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
+  background-color: #f3f4f6;
+}
+
+/* Status tag */
+.status-tag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+}
+
+/* Movie title */
+.movie-title {
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+  color: white;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Footer: price + actions */
+.movie-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+    color: white;
+
+}
+
+.price {
+  font-weight: 600;
+  font-size: 1rem;
+  color: white;
+}
+
+.actions p-button {
+  margin-left: 0.5rem;
+    color: white;
+
+}
+
+/* ---------------- Movie Grid Styling ---------------- */
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.movie-item {
+  display: flex;
+  flex-direction: column;
+}
+
+:host ::ng-deep .movie-item .p-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+}
+
+:host ::ng-deep .movie-item .p-card-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+}
+
+.movie-description {
+  flex: 1 0 auto;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 1400px) {
+  .movies-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  :host {
+    padding: 1rem 1.5rem;
+  }
+
+  .movies-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  :host {
+    padding: 1rem;
+  }
+
+  .movies-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
