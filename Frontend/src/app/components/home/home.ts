@@ -66,62 +66,65 @@ export class Home implements OnInit {
     });
   }
 
-// ---------------- Carousel ----------------
-addToCartProduct(product: ProductLike) {
-  this.cartService.addToCart({
-    id: product.id.toString(),
-    productId: product.id.toString(),
-    name: product.name,
-    price: product.price,
-    maxStock: undefined,
-  });
-}
-
-toggleFavoriteProduct(product: ProductLike) {
-  if (this.isFavoriteProduct(product.id.toString())) {
-    this.favoriteService.removeFromFavorites(product.id.toString());
-  } else {
-    this.favoriteService.addToFavorites({
+  // ---------------- Carousel ----------------
+  addToCartProduct(product: ProductLike) {
+    this.cartService.addToCart({
       id: product.id.toString(),
       productId: product.id.toString(),
       name: product.name,
+      image: product.image,
       price: product.price,
+      maxStock: undefined,
     });
   }
-}
 
-isFavoriteProduct(productId?: string): boolean {
-  return productId ? this.favoriteService.isFavorite(productId) : false;
-}
+  toggleFavoriteProduct(product: ProductLike) {
+    if (this.isFavoriteProduct(product.id.toString())) {
+      this.favoriteService.removeFromFavorites(product.id.toString());
+    } else {
+      this.favoriteService.addToFavorites({
+        id: product.id.toString(),
+        productId: product.id.toString(),
+        name: product.name,
+        image: product.image,
+        price: product.price,
+      });
+    }
+  }
 
-// ---------------- Movie Grid ----------------
-addToCartMovie(movie: MovieItem) {
-  this.cartService.addToCart({
-    id: movie.id.toString(),
-    productId: movie.id.toString(),
-    name: movie.title,
-    price: 0,
-    maxStock: undefined,
-  });
-}
+  isFavoriteProduct(productId?: string): boolean {
+    return productId ? this.favoriteService.isFavorite(productId) : false;
+  }
 
-toggleFavoriteMovie(movie: MovieItem) {
-  if (this.isFavoriteMovie(movie.id)) {
-    this.favoriteService.removeFromFavorites(movie.id.toString());
-  } else {
-    this.favoriteService.addToFavorites({
+  // ---------------- Movie Grid ----------------
+  addToCartMovie(movie: MovieItem) {
+    this.cartService.addToCart({
       id: movie.id.toString(),
       productId: movie.id.toString(),
       name: movie.title,
+      image: movie.posterUrl,
       price: 0,
+      maxStock: undefined,
     });
   }
-}
 
-isFavoriteMovie(movieId?: number): boolean {
-  return movieId ? this.favoriteService.isFavorite(movieId.toString()) : false;
-}
+  toggleFavoriteMovie(movie: MovieItem) {
+    if (this.isFavoriteMovie(movie.id)) {
+      this.favoriteService.removeFromFavorites(movie.id.toString());
+    } else {
+      this.favoriteService.addToFavorites({
+        id: movie.id.toString(),
+        productId: movie.id.toString(),
+        image: movie.posterUrl,
+        name: movie.title,
+        price: 0,
+      });
+    }
+  }
 
+  isFavoriteMovie(movieId?: number): boolean {
+    return movieId ? this.favoriteService.isFavorite(movieId.toString()) : false;
+  }
 
   loadMovies(): void {
     this.loadingMovies = true;

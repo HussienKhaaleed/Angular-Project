@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 interface TmdbMovie {
@@ -11,6 +11,7 @@ interface TmdbMovie {
   backdrop_path: string | null;
   vote_average: number;
   release_date?: string;
+  price: number;
   first_air_date?: string;
   popularity: number;
   genre_ids: number[];
@@ -33,6 +34,7 @@ export interface MovieItem {
   title: string;
   overview: string;
   posterUrl: string;
+  price: number;
   releaseDate?: string;
   genreIds: number[];
   voteAverage: number;
@@ -117,6 +119,7 @@ export class TmdbService {
     return {
       id: m.id,
       title: m.title || m.name || 'Untitled',
+      price: Number((m.vote_average * 2).toFixed(2)),
       overview: m.overview || '',
       posterUrl: m.poster_path ? `${this.imgBase}${m.poster_path}` : '',
       releaseDate: m.release_date || m.first_air_date,

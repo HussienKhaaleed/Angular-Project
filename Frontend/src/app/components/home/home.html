@@ -30,10 +30,7 @@
             [ngClass]="isFavoriteProduct(product.id) ? 'text-red-500' : 'text-gray-400'"
           ></p-button>
 
-          <p-button
-            icon="pi pi-shopping-cart"
-            (click)="addToCartProduct(product)"
-          ></p-button>
+          <p-button icon="pi pi-shopping-cart" (click)="addToCartProduct(product)"></p-button>
         </div>
       </div>
     </div>
@@ -79,17 +76,18 @@
           {{ m.overview || 'No overview available.' }}
         </p>
 
-        <div class="flex justify-content-between mt-3">
-          <p-button
-            icon="pi pi-heart"
-            (click)="toggleFavoriteMovie(m)"
-            [ngClass]="isFavoriteMovie(m.id) ? 'text-red-500' : 'text-gray-400'"
-          ></p-button>
+        <div class="price">${{ m.price }}</div>
+        <div class="flex justify-content-between mt-3 align-items-center">
+          <div class="flex gap-3">
+            <p-button
+              icon="pi pi-heart"
+              (click)="toggleFavoriteMovie(m)"
+              [ngClass]="isFavoriteMovie(m.id) ? 'text-red-500' : 'text-gray-400'"
+            >
+            </p-button>
 
-          <p-button
-            icon="pi pi-shopping-cart"
-            (click)="addToCartMovie(m)"
-          ></p-button>
+            <p-button icon="pi pi-shopping-cart" (click)="addToCartMovie(m)"> </p-button>
+          </div>
         </div>
       </p-card>
     </div>
