@@ -7,7 +7,7 @@
 <p-confirmDialog></p-confirmDialog>
 
 <nav
-  class="sticky top-0 bg-white dark:bg-gray-900 shadow-md px-6 py-4 flex justify-between items-center z-50"
+  class="sticky top-0 bg-gray-900 text-gray-100 shadow-md px-6 py-4 flex justify-between items-center z-50"
 >
   <!-- Left: Logo + Links -->
   <div class="flex items-center space-x-6">
@@ -24,7 +24,7 @@
   <div class="flex items-center space-x-4">
     <!-- Favorite Button -->
     <button
-      class="relative p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+      class="relative p-2 hover:bg-gray-800 rounded-full"
       (click)="openFavorites()"
     >
       <i class="pi pi-heart text-xl"></i>
@@ -38,7 +38,7 @@
 
     <!-- Cart Button -->
     <button
-      class="relative p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+      class="relative p-2 hover:bg-gray-800 rounded-full"
       (click)="openCart()"
     >
       <i class="pi pi-shopping-cart text-xl"></i>
@@ -64,6 +64,11 @@
         class="p-button-outlined hidden md:inline"
         (click)="showRegisterDialog.set(true)"
       ></button>
+            <button 
+        label="Dashboard" 
+        icon="pi pi-chart-bar" 
+        routerLink=""
+      ></button>
     </ng-container>
 
     <!-- User Info (Desktop) -->
@@ -79,6 +84,13 @@
         </div>
         <button
           pButton
+          label="Dashboard"
+          icon="pi pi-chart-bar"
+          routerLink="/dashboard"
+          class="p-button-text"
+        ></button>
+        <button
+          pButton
           label="Logout"
           icon="pi pi-sign-out"
           class="p-button-text"
@@ -89,7 +101,7 @@
 
     <!-- Mobile menu toggle -->
     <button
-      class="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+      class="md:hidden p-2 hover:bg-gray-800 rounded-full"
       (click)="toggleMobileMenu()"
     >
       <i [class]="mobileMenuOpen() ? 'pi pi-times' : 'pi pi-bars'" class="text-xl"></i>
@@ -100,7 +112,7 @@
 <!-- Mobile Menu -->
 <div
   *ngIf="mobileMenuOpen()"
-  class="md:hidden bg-white dark:bg-gray-900 shadow-md px-6 py-4 space-y-3 z-40"
+  class="md:hidden bg-gray-900 text-gray-100 shadow-md px-6 py-4 space-y-3 z-40"
 >
   <a href="#" class="block hover:text-blue-500 py-2" (click)="closeMobileMenu()">Home</a>
   <a href="#" class="block hover:text-blue-500 py-2" (click)="closeMobileMenu()">About</a>
@@ -132,12 +144,21 @@
         </div>
         <span class="font-medium">{{ user()?.name }}</span>
       </div>
-      <button
-        pButton
-        icon="pi pi-sign-out"
-        class="p-button-text p-button-rounded"
-        (click)="logout()"
-      ></button>
+      <div class="flex items-center space-x-2">
+        <button
+          pButton
+          icon="pi pi-chart-bar"
+          class="p-button-text p-button-rounded"
+          routerLink="/dashboard"
+          (click)="closeMobileMenu()"
+        ></button>
+        <button
+          pButton
+          icon="pi pi-sign-out"
+          class="p-button-text p-button-rounded"
+          (click)="logout()"
+        ></button>
+      </div>
     </div>
   </ng-container>
 </div>
@@ -285,11 +306,11 @@
   <ng-template pTemplate="footer">
     <div *ngIf="cartItems().length > 0" class="space-y-4">
       <div class="flex justify-between items-center py-3 border-t dark:border-gray-700">
-        <div class="text-sm text-gray-600 dark:text-gray-400">
-          <div class="font-medium">
-            Items: <span class="text-gray-900 dark:text-white">{{ cartCount() }}</span>
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            <div class="font-medium">
+              Items: <span class="text-gray-100">{{ cartCount() }}</span>
+            </div>
           </div>
-        </div>
         <div class="text-right">
           <div class="text-sm text-gray-500 mb-1">Total</div>
           <div class="text-3xl font-bold text-blue-600 dark:text-blue-400">

@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -28,6 +28,7 @@ import { FavoriteService } from '../../services/favorite.service';
     TooltipModule,
     ToastModule,
     ConfirmDialogModule,
+    RouterModule,
   ],
   providers: [MessageService, ConfirmationService],
 })

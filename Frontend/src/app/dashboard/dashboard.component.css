@@ -1,0 +1,155 @@
+/* Progress bars */
+.genre-item .progress-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.genre-item .progress-fill {
+  height: 100%;
+  transition: all 0.5s ease-in-out;
+}
+
+/* Card hover effects */
+.stat-card:hover {
+  transform: translateY(-4px);
+  transition: transform 0.3s ease;
+}
+
+.movie-card {
+  transition: all 0.3s ease;
+}
+
+.movie-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.action-card {
+  transition: all 0.3s ease;
+}
+
+.action-card:hover {
+  transform: scale(1.05);
+}
+
+/* Glassmorphism effect for dark theme */
+.glass-effect {
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Progress bar colors */
+.red-bar .p-progressbar-value {
+  background: linear-gradient(90deg, #ef4444, #dc2626) !important;
+}
+
+.orange-bar .p-progressbar-value {
+  background: linear-gradient(90deg, #f97316, #ea580c) !important;
+}
+
+.yellow-bar .p-progressbar-value {
+  background: linear-gradient(90deg, #eab308, #ca8a04) !important;
+}
+
+/* Card transitions */
+.p-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: rgba(17, 24, 39, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.p-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.p-card .p-card-header {
+  background: rgba(31, 41, 55, 0.7) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.p-card .p-card-content {
+  color: #e5e7eb !important;
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f2937;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Hover effects for activity items */
+.activity-item {
+  transition: all 0.2s ease;
+}
+
+.activity-item:hover {
+  background: rgba(31, 41, 55, 0.9);
+  transform: translateX(4px);
+}
+
+/* Dark theme text colors */
+.text-title {
+  color: #f3f4f6 !important;
+}
+
+.text-subtitle {
+  color: #9ca3af !important;
+}
+
+/* Dark theme card overrides */
+:host ::ng-deep .p-card {
+  background: rgba(17, 24, 39, 0.7) !important;
+}
+
+:host ::ng-deep .p-card .p-card-header {
+  background: rgba(31, 41, 55, 0.7) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+:host ::ng-deep .p-card .p-card-content {
+  color: #e5e7eb !important;
+}
+
+/* Progress spinner for dark theme */
+:host ::ng-deep .p-progress-spinner circle {
+  stroke: #6366f1 !important;
+}
+
+/* Button styles for dark theme */
+:host ::ng-deep .p-button.p-button-outlined {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #e5e7eb;
+}
+
+:host ::ng-deep .p-button.p-button-outlined:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Tag styles for dark theme */
+:host ::ng-deep .p-tag {
+  background: rgba(99, 102, 241, 0.2);
+  color: #c7d2fe;
+}
+
+/* Progress bar background for dark theme */
+:host ::ng-deep .p-progressbar {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
