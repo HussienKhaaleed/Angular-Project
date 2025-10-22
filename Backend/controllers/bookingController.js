@@ -17,22 +17,50 @@ function getStripe() {
 
 exports.createCheckoutSession = async (req, res, next) => {
   try {
-    const { movieId, ticketsCount, showTime } = req.body;
+    const { items } = req.body;
 
-    if (!movieId || !ticketsCount || !showTime) {
+    if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({
         status: "fail",
-        message: "movieId, ticketsCount and showTime are required",
+        message: "items array is required with at least one item",
       });
     }
 
-    const movie = await MovieModel.findById(movieId);
-    if (!movie)
-      return res
-        .status(404)
-        .json({ status: "fail", message: "Movie not found" });
+    // Validate and fetch all movies
+    const movieIds = items.map(item => item.movieId);
+    const movies = await MovieModel.find({ _id: { $in: movieIds } });
+
+    if (movies.length !== movieIds.length) {
+      return res.status(404).json({ 
+        status: "fail", 
+        message: "One or more movies not found" 
+      });
+    }
+
+    const moviesMap = movies.reduce((map, movie) => {
+      map[movie._id.toString()] = movie;
+      return map;
+    }, {});
 
     const stripe = getStripe();
+
+    // Create line items for each movie in cart
+    const line_items = items.map(item => {
+      const movie = moviesMap[item.movieId];
+      return {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: movie.title,
+            images: [
+              `${req.protocol}://${req.get("host")}/moviePosters/${movie.posterImage}`,
+            ],
+          },
+          unit_amount: movie.price * 100, // amount in cents
+        },
+        quantity: item.ticketsCount,
+      };
+    });
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -40,28 +68,10 @@ exports.createCheckoutSession = async (req, res, next) => {
       success_url: `${process.env.FRONTEND_URL}/payment-success`,
       cancel_url: `${process.env.FRONTEND_URL}/payment-cancel`,
       customer_email: req.user.email,
-      client_reference_id: movieId,
-      line_items: [
-        {
-          price_data: {
-            currency: "egp",
-            product_data: {
-              name: movie.title,
-              images: [
-                `${req.protocol}://${req.get("host")}/moviePosters/${
-                  movie.posterImage
-                }`,
-              ],
-            },
-            unit_amount: movie.price * 100, // amount in *piasters*
-          },
-          quantity: ticketsCount,
-        },
-      ],
+      line_items,
       metadata: {
         userId: req.user._id.toString(),
-        ticketsCount: ticketsCount.toString(),
-        showTime: showTime.toString(),
+        items: JSON.stringify(items), // Store all items for webhook processing
       },
     });
 
@@ -98,13 +108,7 @@ exports.handleStripeWebhook = async (req, res) => {
       const session = event.data.object;
       const metadata = session.metadata || {};
       const userId = metadata.userId;
-      const movieId = session.client_reference_id;
-      const ticketsCount = metadata.ticketsCount
-        ? Number(metadata.ticketsCount)
-        : 1;
-      const showTime = metadata.showTime
-        ? new Date(metadata.showTime)
-        : new Date();
+      const items = JSON.parse(metadata.items || "[]");
       const amountPaid = session.amount_total / 100;
 
       const user = await UserModel.findById(userId);
@@ -113,31 +117,34 @@ exports.handleStripeWebhook = async (req, res) => {
         return res.status(400).send("User not found");
       }
 
-      const movie = await MovieModel.findById(movieId);
-      if (!movie) {
-        console.error("Movie not found for webhook session:", movieId);
-        return res.status(400).send("Movie not found");
+      // Create a booking for each movie in the order
+      for (const item of items) {
+        const movie = await MovieModel.findById(item.movieId);
+        if (!movie) {
+          console.error("Movie not found for webhook session:", item.movieId);
+          continue; // Skip this item but process others
+        }
+
+        const showTime = item.showTime ? new Date(item.showTime) : new Date();
+
+        const existingBooking = await BookingModel.findOne({
+          user: user._id,
+          movie: movie._id,
+          showTime,
+          ticketsCount: item.ticketsCount,
+        });
+
+        if (!existingBooking) {
+          await BookingModel.create({
+            user: user._id,
+            movie: movie._id,
+            showTime,
+            ticketsCount: item.ticketsCount,
+            amountPaid: movie.price * item.ticketsCount, // Store individual movie amount
+            paymentStatus: "paid",
+          });
+        }
       }
-
-      const existingBooking = await BookingModel.findOne({
-        user: user._id,
-        movie: movie._id,
-        amountPaid,
-      });
-
-      if (existingBooking) {
-        console.log("Duplicate booking ignored");
-        return res.status(200).json({ received: true });
-      }
-
-      await BookingModel.create({
-        user: user._id,
-        movie: movie._id,
-        showTime,
-        ticketsCount,
-        amountPaid,
-        paymentStatus: "paid",
-      });
     }
 
     res.status(200).json({ received: true });
