@@ -1,7 +1,6 @@
 # CinemaVerse - Movie Booking Platform
 
 <div align="center">
-  <img src="https://via.placeholder.com/150?text=CinemaVerse" alt="CinemaVerse Logo" width="150px"/>
   <br>
   <p>A full-stack movie booking application built with Angular and Node.js</p>
   
