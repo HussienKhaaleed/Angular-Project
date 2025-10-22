@@ -2,33 +2,35 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { CarouselModule } from 'primeng/carousel';
-import { DialogModule } from 'primeng/dialog';
-import { TextareaModule } from 'primeng/textarea';
-import { MultiSelectModule } from 'primeng/multiselect';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { TagModule } from 'primeng/tag';
-import { RatingModule } from 'primeng/rating';
 import { CartService } from '../../services/cart.service';
 import { FavoriteService } from '../../services/favorite.service';
-import { Genre, MovieItem, ProductLike, TmdbService } from '../../services/tmdb.service';
+import { Genre, MovieItem, MovieService, ProductLike } from '../../services/movie.service';
+
+// Import components
+import { AboutComponent } from '../about/about';
+import { CarouselItemComponent } from '../carousel-item/carousel-item';
+import { ContactComponent } from '../contact/contact';
+import { MovieCardComponent } from '../movie-card/movie-card';
+import { MovieDetailComponent } from '../movie-detail/movie-detail';
+import { MovieFilterComponent } from '../movie-filter/movie-filter';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
     CommonModule,
-    TagModule,
     CarouselModule,
-    MultiSelectModule,
     ProgressSpinnerModule,
-    CardModule,
     ButtonModule,
     FormsModule,
-    DialogModule,
-    TextareaModule,
-    RatingModule
+    AboutComponent,
+    ContactComponent,
+    CarouselItemComponent,
+    MovieCardComponent,
+    MovieFilterComponent,
+    MovieDetailComponent
   ],
   templateUrl: './home.html',
   styleUrls: ['./home.css'],
@@ -45,7 +47,7 @@ export class Home implements OnInit {
 
   // Filter by genre + cards
   genres: Genre[] = [];
-  selectedGenres: number[] = [];
+  selectedGenres: string[] = [];
   movies: MovieItem[] = [];
   loadingMovies = false;
 
@@ -59,20 +61,20 @@ export class Home implements OnInit {
   reviews: { [key: string]: Array<{text: string, rating: number, date: string}> } = {};
 
   constructor(
-    private tmdb: TmdbService,
+    private movieService: MovieService,
     public cartService: CartService,
     public favoriteService: FavoriteService
   ) {}
 
   ngOnInit(): void {
     // Load carousel items
-    this.tmdb.getPopularMovies().subscribe({
+    this.movieService.getPopularMovies().subscribe({
       next: (items) => (this.products = items),
       error: (err) => console.error('Failed to load popular movies', err),
     });
 
     // Load genres then initial movie list
-    this.tmdb.getGenres().subscribe({
+    this.movieService.getGenres().subscribe({
       next: (gs) => {
         this.genres = gs;
         this.loadMovies();
@@ -104,65 +106,11 @@ export class Home implements OnInit {
     }, 1500);
   }
 
-// ---------------- Carousel ----------------
-addToCartProduct(product: ProductLike) {
-  this.cartService.addToCart({
-    id: product.id.toString(),
-    productId: product.id.toString(),
-    name: product.name,
-    price: product.price,
-    maxStock: undefined,
-  });
-}
-
-toggleFavoriteProduct(product: ProductLike) {
-  if (this.isFavoriteProduct(product.id.toString())) {
-    this.favoriteService.removeFromFavorites(product.id.toString());
-  } else {
-    this.favoriteService.addToFavorites({
-      id: product.id.toString(),
-      productId: product.id.toString(),
-      name: product.name,
-      price: product.price,
-    });
-  }
-}
-
-  isFavoriteProduct(productId?: string): boolean {
-    return productId ? this.favoriteService.isFavorite(productId) : false;
-  }
-
-// ---------------- Movie Grid ----------------
-addToCartMovie(movie: MovieItem) {
-  this.cartService.addToCart({
-    id: movie.id.toString(),
-    productId: movie.id.toString(),
-    name: movie.title,
-    price: 0,
-    maxStock: undefined,
-  });
-}
-
-toggleFavoriteMovie(movie: MovieItem) {
-  if (this.isFavoriteMovie(movie.id)) {
-    this.favoriteService.removeFromFavorites(movie.id.toString());
-  } else {
-    this.favoriteService.addToFavorites({
-      id: movie.id.toString(),
-      productId: movie.id.toString(),
-      name: movie.title,
-      price: 0,
-    });
-  }
-}
-
-  isFavoriteMovie(movieId?: number): boolean {
-    return movieId ? this.favoriteService.isFavorite(movieId.toString()) : false;
-  }
+  // These methods are now handled by the individual components
 
   loadMovies(): void {
     this.loadingMovies = true;
-    this.tmdb.discoverMovies({ genreIds: this.selectedGenres }).subscribe({
+    this.movieService.discoverMovies({ genreIds: this.selectedGenres }).subscribe({
       next: (items) => {
         this.movies = items;
         this.loadingMovies = false;
@@ -175,11 +123,12 @@ toggleFavoriteMovie(movie: MovieItem) {
     });
   }
 
-  onGenresChange(): void {
+  onGenresChanged(genres: string[]): void {
+    this.selectedGenres = genres;
     this.loadMovies();
   }
 
-  clearGenres(): void {
+  resetFilters(): void {
     this.selectedGenres = [];
     this.loadMovies();
   }
@@ -212,8 +161,8 @@ toggleFavoriteMovie(movie: MovieItem) {
     this.userRating = 0;
   }
 
-  addReview() {
-    if (!this.selectedMovie || !this.newReview.trim()) return;
+  addReview(review: { text: string, rating: number, date: string }) {
+    if (!this.selectedMovie) return;
 
     const movieId = 'title' in this.selectedMovie
       ? this.selectedMovie.id.toString()
@@ -224,15 +173,7 @@ toggleFavoriteMovie(movie: MovieItem) {
     }
 
     // Add new review
-    this.reviews[movieId].push({
-      text: this.newReview,
-      rating: this.userRating || 3,
-      date: new Date().toISOString().split('T')[0]
-    });
-
-    // Reset form
-    this.newReview = '';
-    this.userRating = 0;
+    this.reviews[movieId].push(review);
   }
 
   getMovieTitle(): string {

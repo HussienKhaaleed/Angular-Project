@@ -1,8 +1,9 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, Observable, of, tap, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
+import { HttpService } from './http.service';
 
 export interface User {
   id: string;
@@ -25,13 +26,13 @@ export class AuthService {
   private readonly TOKEN_KEY = 'auth_token';
   private readonly TOKEN_EXPIRY_KEY = 'auth_token_expiry';
   private readonly DEFAULT_TOKEN_EXPIRY = 30 * 24 * 60 * 60;
-  private api = 'http://localhost:5000/api/v1/';
-  private clientID = '435599770187-ev5gsvsfq1u560msf7upaonval162erj.apps.googleusercontent.com ';
+  private api = environment.apiUrl;
+  private clientID = environment.googleClientId;
 
   currentUser = signal<User | null>(null);
   isAuthenticated = signal<boolean>(false);
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(private httpService: HttpService, private router: Router) {
     this.loadUserFromStorage();
   }
 
@@ -52,8 +53,8 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(this.api + 'auth/signin', { email, password }).pipe(
-      tap((res) => this.handleAuthSuccess(res)),
+    return this.httpService.post<AuthResponse>(`${this.api}/auth/signin`, { email, password }).pipe(
+      tap((res: AuthResponse) => this.handleAuthSuccess(res)),
       catchError((err) => {
         console.error('Login failed', err);
         return throwError(() => err);
@@ -62,8 +63,8 @@ export class AuthService {
   }
 
   register(name: string, email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(this.api + 'auth/register', { name, email, password }).pipe(
-      tap((res) => this.handleAuthSuccess(res)),
+    return this.httpService.post<AuthResponse>(`${this.api}/auth/register`, { name, email, password }).pipe(
+      tap((res: AuthResponse) => this.handleAuthSuccess(res)),
       catchError((err) => {
         console.error('Register failed', err);
         return throwError(() => err);
@@ -97,8 +98,8 @@ export class AuthService {
   }
 
   loginWithGoogleBackend(token: string) {
-    return this.http.post<AuthResponse>(this.api + 'auth/google', { token }).pipe(
-      tap((response) => this.handleAuthSuccess(response)),
+    return this.httpService.post<AuthResponse>(`${this.api}/auth/google`, { token }).pipe(
+      tap((response: AuthResponse) => this.handleAuthSuccess(response)),
       catchError((error) => {
         console.error('Google login backend failed:', error);
         return throwError(() => error);
@@ -108,10 +109,10 @@ export class AuthService {
 
   handleGoogleToken(response: any) {
     const token = response.credential;
-    this.http
-      .post<AuthResponse>(this.api + 'auth/google', { token })
+    this.httpService
+      .post<AuthResponse>(`${this.api}/auth/google`, { token })
       .pipe(
-        tap((res) => this.handleAuthSuccess(res)),
+        tap((res: AuthResponse) => this.handleAuthSuccess(res)),
         catchError((err) => {
           console.error('Google login failed', err);
           return of(null);
@@ -134,8 +135,8 @@ export class AuthService {
   }
 
   refreshToken(): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(this.api + 'auth/refresh', {}).pipe(
-      tap((res) => this.handleAuthSuccess(res)),
+    return this.httpService.post<AuthResponse>(`${this.api}/auth/refresh`, {}).pipe(
+      tap((res: AuthResponse) => this.handleAuthSuccess(res)),
       catchError((err) => {
         console.error('Token refresh failed', err);
         this.logout();
@@ -164,8 +165,8 @@ export class AuthService {
   }
 
   verifySession(): Observable<boolean> {
-    return this.http.get<{ valid: boolean }>(this.api + 'auth/verify').pipe(
-      tap((res) => {
+    return this.httpService.get<{ valid: boolean }>(`${this.api}/auth/verify`).pipe(
+      tap((res: { valid: boolean }) => {
         if (!res.valid) {
           this.logout();
         }
@@ -174,13 +175,13 @@ export class AuthService {
         this.logout();
         return of(false);
       }),
-      map((res) => (typeof res === 'boolean' ? res : res.valid))
+      map((res: { valid: boolean } | boolean) => (typeof res === 'boolean' ? res : res.valid))
     );
   }
 
   updateUserProfile(updates: Partial<User>): Observable<User> {
-    return this.http.patch<User>(this.api + 'users/me', updates).pipe(
-      tap((user) => {
+    return this.httpService.patch<User>(`${this.api}/users/me`, updates).pipe(
+      tap((user: User) => {
         this.currentUser.set(user);
         localStorage.setItem(this.STORAGE_KEY, JSON.stringify(user));
       }),

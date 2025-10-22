@@ -1,7 +1,8 @@
-import { HttpClient } from '@angular/common/http';
 import { computed, Injectable, signal } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
+import { HttpService } from './http.service';
 
 export interface CartItem {
   id: string;
@@ -26,7 +27,7 @@ export class CartService {
   private readonly CART_COOKIE_KEY = 'cart';
   private readonly COOKIE_EXPIRY_DAYS = 7;
   private readonly MAX_QUANTITY_PER_ITEM = 99;
-  private api = 'http://localhost:5000/api/v1/cart/';
+  private api = `${environment.apiUrl}/cart`;
 
   private cartItems = signal<CartItem[]>([]);
 
@@ -38,7 +39,7 @@ export class CartService {
     return this.cartItems().reduce((total, item) => total + item.price * item.quantity, 0);
   });
 
-  constructor(private http: HttpClient) {
+  constructor(private httpService: HttpService) {
     this.loadCartFromStorage();
   }
 
@@ -49,14 +50,14 @@ export class CartService {
       if (!cartJson) {
         const cookieCart = this.getCookie(this.CART_COOKIE_KEY);
         if (cookieCart) {
-          const cart = JSON.parse(cookieCart);
+          const cart = JSON.parse(cookieCart) as CartItem[];
           this.cartItems.set(cart);
           return;
         }
       }
 
       if (cartJson) {
-        const cart = JSON.parse(cartJson);
+        const cart = JSON.parse(cartJson) as CartItem[];
         this.cartItems.set(cart);
       }
     } catch (error) {
@@ -198,12 +199,12 @@ export class CartService {
   }
 
   syncCartWithBackend(): Observable<CartSyncResponse> {
-    return this.http
-      .post<CartSyncResponse>(`${this.api}/cart/sync`, {
+    return this.httpService
+      .post<CartSyncResponse>(`${this.api}/sync`, {
         items: this.cartItems(),
       })
       .pipe(
-        tap((response) => {
+        tap((response: CartSyncResponse) => {
           if (response.success && response.cart) {
             this.cartItems.set(response.cart);
             this.saveCartToStorage();
@@ -217,8 +218,8 @@ export class CartService {
   }
 
   loadCartFromBackend(): Observable<CartItem[]> {
-    return this.http.get<CartItem[]>(`${this.api}/cart`).pipe(
-      tap((cart) => {
+    return this.httpService.get<CartItem[]>(`${this.api}`).pipe(
+      tap((cart: CartItem[]) => {
         this.cartItems.set(cart);
         this.saveCartToStorage();
       }),
@@ -257,15 +258,15 @@ export class CartService {
   }
 
   validateCart(): Observable<{ valid: boolean; invalidItems: string[] }> {
-    return this.http
-      .post<{ valid: boolean; invalidItems: string[] }>(`${this.api}/cart/validate`, {
+    return this.httpService
+      .post<{ valid: boolean; invalidItems: string[] }>(`${this.api}/validate`, {
         items: this.cartItems(),
       })
       .pipe(
-        tap((response) => {
+        tap((response: { valid: boolean; invalidItems: string[] }) => {
           if (!response.valid && response.invalidItems.length > 0) {
             // Remove invalid items
-            response.invalidItems.forEach((productId) => {
+            response.invalidItems.forEach((productId: string) => {
               this.removeFromCart(productId);
             });
           }

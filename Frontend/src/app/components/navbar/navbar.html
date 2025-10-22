@@ -11,12 +11,14 @@
 >
   <!-- Left: Logo + Links -->
   <div class="flex items-center space-x-6">
-    <span class="font-bold text-xl cursor-pointer">MyShop</span>
+    <span class="font-bold text-xl cursor-pointer flex items-center">
+  <i class="pi pi-play-circle text-blue-600 dark:text-blue-400 mr-2 text-2xl"></i>
+  <span class="text-gradient">CinemaVerse</span>
+</span>
     <div class="hidden md:flex space-x-6">
-      <a href="#" class="hover:text-blue-500">Home</a>
-      <a href="#" class="hover:text-blue-500">About</a>
-      <a href="#" class="hover:text-blue-500">Shop</a>
-      <a href="#" class="hover:text-blue-500">Contact</a>
+      <a href="#movies" class="hover:text-blue-500">Movies</a>
+      <a href="#about" class="hover:text-blue-500">About Us</a>
+      <a href="#contact" class="hover:text-blue-500">Contact</a>
     </div>
   </div>
 
@@ -102,10 +104,9 @@
   *ngIf="mobileMenuOpen()"
   class="md:hidden bg-white dark:bg-gray-900 shadow-md px-6 py-4 space-y-3 z-40"
 >
-  <a href="#" class="block hover:text-blue-500 py-2" (click)="closeMobileMenu()">Home</a>
-  <a href="#" class="block hover:text-blue-500 py-2" (click)="closeMobileMenu()">About</a>
-  <a href="#" class="block hover:text-blue-500 py-2" (click)="closeMobileMenu()">Shop</a>
-  <a href="#" class="block hover:text-blue-500 py-2" (click)="closeMobileMenu()">Contact</a>
+  <a href="#movies" class="block hover:text-blue-500 py-2" (click)="closeMobileMenu()">Movies</a>
+  <a href="#about" class="block hover:text-blue-500 py-2" (click)="closeMobileMenu()">About Us</a>
+  <a href="#contact" class="block hover:text-blue-500 py-2" (click)="closeMobileMenu()">Contact</a>
 
   <!-- <ng-container *ngIf="!isAuthenticated()">
     <button
@@ -152,6 +153,7 @@
   [contentStyle]="{ padding: '1.5rem' }"
   [draggable]="false"
   [resizable]="false"
+  [dismissableMask]="true"
 >
   <div *ngIf="favoriteItems().length === 0" class="text-center py-12">
     <i class="pi pi-heart text-7xl text-gray-300 mb-4 block"></i>
@@ -225,6 +227,7 @@
   [contentStyle]="{ padding: '1.5rem' }"
   [draggable]="false"
   [resizable]="false"
+  [dismissableMask]="true"
 >
   <div *ngIf="cartItems().length === 0" class="text-center py-12">
     <i class="pi pi-shopping-cart text-7xl text-gray-300 mb-4 block"></i>

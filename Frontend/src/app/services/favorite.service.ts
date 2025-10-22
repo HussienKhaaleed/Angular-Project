@@ -1,7 +1,8 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
+import { HttpService } from './http.service';
 
 export interface FavoriteItem {
   id: string;
@@ -24,7 +25,7 @@ export class FavoriteService {
   private readonly STORAGE_KEY = 'app_fav';
   private readonly COOKIE_KEY = 'favorites';
   private readonly COOKIE_EXPIRY_DAYS = 30;
-  private api = 'http://localhost:5000/api/v1/favorite/';
+  private api = `${environment.apiUrl}/favorite`;
 
   private favoriteItems = signal<FavoriteItem[]>([]);
 
@@ -33,7 +34,7 @@ export class FavoriteService {
 
   favoriteIds = computed(() => this.favoriteItems().map((item) => item.productId));
 
-  constructor(private http: HttpClient) {
+  constructor(private httpService: HttpService) {
     this.loadFavoritesFromStorage();
   }
 
@@ -165,12 +166,12 @@ export class FavoriteService {
   }
 
   syncFavoritesWithBackend(): Observable<FavoriteSyncResponse> {
-    return this.http
-      .post<FavoriteSyncResponse>(`${this.api}/favorites/sync`, {
+    return this.httpService
+      .post<FavoriteSyncResponse>(`${this.api}/sync`, {
         items: this.favoriteItems(),
       })
       .pipe(
-        tap((response) => {
+        tap((response: FavoriteSyncResponse) => {
           if (response.success && response.favorites) {
             this.favoriteItems.set(this.parseFavorites(response.favorites));
             this.saveFavoritesToStorage();
@@ -184,8 +185,8 @@ export class FavoriteService {
   }
 
   loadFavoritesFromBackend(): Observable<FavoriteItem[]> {
-    return this.http.get<FavoriteItem[]>(`${this.api}/favorites`).pipe(
-      tap((favorites) => {
+    return this.httpService.get<FavoriteItem[]>(`${this.api}`).pipe(
+      tap((favorites: FavoriteItem[]) => {
         this.favoriteItems.set(this.parseFavorites(favorites));
         this.saveFavoritesToStorage();
       }),
